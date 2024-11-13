@@ -1377,6 +1377,25 @@ bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& 
                     break;
                 }
 
+                case OP_PAIRCOMMIT: {
+                    // OP_PAIRCOMMIT is only available in Tapscript
+                    if (sigversion == SigVersion::BASE || sigversion == SigVersion::WITNESS_V0) return set_error(serror, SCRIPT_ERR_BAD_OPCODE);
+                    // DISCOURAGE for OP_PAIRCOMMIT is handled in OP_SUCCESS handling
+
+                    // x1 x2 -- hash
+                    if (stack.size() < 2) {
+                        return set_error(serror, SCRIPT_ERR_INVALID_STACK_OPERATION);
+                    }
+                    const valtype& vch1 = stacktop(-2);
+                    const valtype& vch2 = stacktop(-1);
+
+                    uint256 hash = PairCommitHash(vch1, vch2);
+
+                    popstack(stack);
+                    popstack(stack);
+                    stack.emplace_back(hash.begin(), hash.end());
+                    break;
+                }
                 default:
                     return set_error(serror, SCRIPT_ERR_BAD_OPCODE);
             }
@@ -1698,6 +1717,12 @@ template PrecomputedTransactionData::PrecomputedTransactionData(const CMutableTr
 const HashWriter HASHER_TAPSIGHASH{TaggedHash("TapSighash")};
 const HashWriter HASHER_TAPLEAF{TaggedHash("TapLeaf")};
 const HashWriter HASHER_TAPBRANCH{TaggedHash("TapBranch")};
+const HashWriter HASHER_PAIRCOMMIT{TaggedHash("PairCommit")};
+
+uint256 PairCommitHash(const std::vector<unsigned char>& x1, const std::vector<unsigned char>& x2)
+{
+    return (HashWriter{HASHER_PAIRCOMMIT} << x1 << x2).GetSHA256();
+}
 
 static bool HandleMissingData(MissingDataBehavior mdb)
 {
