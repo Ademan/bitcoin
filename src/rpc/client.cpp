@@ -320,6 +320,8 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "stop", 0, "wait" },
     { "addnode", 2, "v2transport" },
     { "addconnection", 2, "v2transport" },
+    { "getdefaulttemplate", 1, "input" },
+    { "getdefaulttemplate", 2, "iswitness" },
 };
 // clang-format on
 
