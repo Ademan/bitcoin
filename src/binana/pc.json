@@ -1,0 +1,9 @@
+{
+    "binana": [2025, 3, 0],
+    "deployment": "PAIRCOMMIT",
+    "scriptverify": true,
+    "scriptverify_discourage": true,
+    "opcodes": {
+        "PAIRCOMMIT": "0xcd"
+    }
+}
